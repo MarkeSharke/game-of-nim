@@ -1,0 +1,239 @@
+/*
+ * Game of Nim 
+ * @author Rhiannon Markegard
+ * @version v8  5/3/18
+ */
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class GameOfNim {
+    /**
+     * Runs the program
+     * @param args 
+     */
+    public static void main(String[] args) {
+        
+        Scanner in = new Scanner(System.in);
+
+        System.out.println("Welcome to the Game of Nim. The object of the game is to " + "\n"
+                + "reduce the pile of marbles to 1. The player will be up against the computer." + "\n"
+                + "For each move, the player or computer can take away no more than half of " + "\n"
+                + "the marbles and must take at least 1. Whoever reduces the marble pile to 1 wins.");
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("Start Game");
+        
+
+        String word = "";
+        int count = 0;
+        
+        //outside loop
+        do {
+
+            if (count == 0) {
+                System.out.println("Want to play? (Y/N): ");
+                //check for correct entry
+                while (!in.hasNext("[YyNn]")) {
+                     System.out.println("Illegal Entry");
+                     System.out.println("Want to play? Enter (Y/N)");
+                     in.next();
+                }
+                word = in.next();
+                
+            }
+            
+            count++;
+
+            if (word.equalsIgnoreCase("y")) {
+
+                Random rng1 = new Random();
+                long seed = rng1.nextLong();
+
+                System.out.println("--------------------------------------------------");
+                System.out.println("seed: " + seed + "L");
+                rng1 = new Random(seed);
+
+                // 0 = stupid, 1 = smart
+                int intelligence = rng1.nextInt(2);
+                System.out.println("Intelligence: " + intelligence);
+                if (intelligence == 0) {
+                    System.out.println("STUPID MODE");
+                } else {
+                    System.out.println("SMART MODE");
+                }
+
+                // 1 = player first, 0 = computer first
+                int turn = rng1.nextInt(2);
+                System.out.println("Turn: " + turn);
+                if (turn == 0) {
+                    System.out.println("Computer goes first");
+                } else {
+                    System.out.println("Player goes first");
+                }
+
+                //chose rand int btw 10-100 for marble pile
+                int marblePile = rng1.nextInt(91) + 10;
+                System.out.println("# of marbles: " + marblePile);
+
+                //loop that runs game
+                while (marblePile > 1) {
+
+                    /*
+                    PLAY GAME
+                    */
+                    //flip between player and computer moves
+                    if (turn == 0) {
+                        turn = 1;
+                        System.out.println("--------------------------------------------------");
+                        System.out.println("Computer's turn");
+                    } else {
+                        turn = 0;
+                        System.out.println("--------------------------------------------------");
+                        System.out.println("Player's turn");
+                    }
+
+                    /*
+                    COMPUTER MOVES
+                    */
+                    //stupid mode             
+                    if (intelligence == 0 && turn == 1) {
+                        //random move
+                        int play = rng1.nextInt((marblePile) / 2) + 1;
+                        if (marblePile - play != 0) {
+                            marblePile -= play;
+                        }
+                        System.out.println("Stupid computer move: " + play);
+                        System.out.println("Size of marble pile after stupid computer move: " + marblePile);
+                        if (marblePile == 1) {
+                            System.out.println("YOU LOSE");
+                        }
+                    } 
+                    //smart mode             
+                    else if (intelligence == 1 && turn == 1) {
+                        int[] illegal = {3, 7, 15, 31, 63};
+
+                        int pile = 0;
+                        int x = 1;
+                        for (int i = 0; i < illegal.length; i++) {
+                            pile = illegal[i];
+                            if (marblePile == pile) {
+                                x = 0;
+                            }
+
+                        }
+                        //random move
+                        if (x == 0) {
+                            int play2 = rng1.nextInt((marblePile) / 2) + 1;
+                            if (marblePile - play2 != 0) {
+                                marblePile -= play2;
+                            }
+                            System.out.println("Smart computer random move: " + play2);
+                            System.out.println("Pile size after smart computer random move: " + marblePile);
+                            if (marblePile == 1) {
+                                System.out.println("YOU LOSE");
+                            }
+                        } else if (x == 1) {
+                            int play2 = 0;
+
+                            int min = marblePile;
+                            ArrayList<Integer> minList = new ArrayList<Integer>();
+
+                            for (int a = 0; a < illegal.length; a++) {
+                                if (min > illegal[a]) {
+                                    int temp = illegal[a];
+                                    minList.add(temp);
+                                }
+                            }
+                            //find max
+                            int max = 0;
+                            for (int m = 0; m < minList.size(); m++) {
+                                if (max < minList.get(m)) {
+                                    max = minList.get(m);
+                                }
+                            }
+
+                            //smart move
+                            int difference = marblePile - max;
+                            if ((marblePile - difference != 0)) {
+                                marblePile -= difference;
+                                System.out.println("Smart Computer's move: " + difference);
+                                System.out.println("Size of marble pile after smart computer move: " + marblePile);
+                                if (marblePile == 1) {
+                                    System.out.println("YOU LOSE");
+                                }
+
+                            } else {
+                                marblePile--;
+                                difference--;
+                                System.out.println("Smart Computer's move: " + difference);
+                                System.out.println("Size of marble pile after smart computer move: " + marblePile);
+                                if (marblePile == 1) {
+                                    System.out.println("YOU LOSE");
+                                }
+
+                            }
+
+                        }
+
+                    } 
+                    /*
+                    PLAYER MOVE
+                    */ 
+                    else {
+                        System.out.println("Enter move: ");
+                        int play3 = 0;
+                        while (!in.hasNextInt()) {
+                
+                        System.out.println("Illegal entry");
+                        System.out.println("Please enter a number for your move: ");
+                        in.next();
+                    }
+                    play3 = in.nextInt();
+
+                        //check if legal move
+                        if (play3 >= 1 && play3 < ((marblePile) / 2) + 1) {
+                            //continue with game
+                            System.out.println("Player move: " + play3);
+                            marblePile -= play3;
+                            System.out.println("Pile size after player move: " + marblePile);
+                            if (marblePile == 1) {
+                                System.out.println("YOU WIN");
+                            }
+                        } 
+                        else {
+                            System.out.println("Illegal move");
+
+                            System.out.println("Enter move: ");
+                            int play5 = in.nextInt();
+                            if (play5 >= 1 && play5 < ((marblePile) / 2) + 1) {
+                                //continue with game
+                                System.out.println("Player move: " + play5);
+                                marblePile -= play5;
+                                System.out.println("Pile size after player move: " + marblePile);
+                                if (marblePile == 1) {
+                                    System.out.println("YOU WIN");
+                                }
+                            }
+
+                        }
+                    }
+
+                }//end of while loop
+
+                System.out.println("Play again? (Y/N) ");
+                //word = in.next();
+
+                while (!in.hasNext("[YyNn]")) {
+                     System.out.println("Illegal Entry");
+                     System.out.println("Want to play? Enter (Y/N)");
+                     in.next();
+                }
+                word = in.next();
+                
+            }
+
+        } while (!word.equalsIgnoreCase("n"));
+    }
+
+}
